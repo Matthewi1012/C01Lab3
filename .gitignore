@@ -1,0 +1,5 @@
+quirknotes/backend/data
+quirknotes/backend/node_modules
+quirknotes/backend/package-lock.json
+quirknotes/frontend/package-lock.json
+quirknotes/frontend/node_modules

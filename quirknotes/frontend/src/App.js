@@ -38,12 +38,48 @@ function App() {
     getNotes()
   }, [])
 
-  const deleteNote = (entry) => {
-    // Code for DELETE here
+  const deleteNote = async (entry) => {
+    try {
+      await fetch(`http://localhost:4000/deleteNote/${entry._id}`, 
+      { method: "DELETE",
+       headers: { 
+        "Content-Type": "application/json"
+      }})
+      .then(async (response) => {
+        if (!response.ok) {
+          console.log("Served failed:", response.status)
+          alert("Server Error")
+        } else {
+            await response.json().then(deleteNoteState(entry)) 
+        }
+      })
+    } catch (error) {
+      console.log("Fetch function failed:", error)
+      alert("Fetch Failed")
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const deleteAllNotes = () => {
-    // Code for DELETE all notes here
+  const deleteAllNotes = async () => {
+    try {
+      await fetch("http://localhost:4000/deleteAllNotes", 
+      { method: "DELETE",
+       headers: { 
+        "Content-Type": "application/json"
+      }})
+      .then(async (response) => {
+        if (!response.ok) {
+          console.log("Served failed:", response.status)
+        } else {
+            await response.json().then(deleteAllNotesState()) 
+        }
+      })
+    } catch (error) {
+      console.log("Fetch function failed:", error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   
@@ -72,17 +108,21 @@ function App() {
     setNotes((prevNotes) => [...prevNotes, {_id, title, content}])
   }
 
-  const deleteNoteState = () => {
-    // Code for modifying state after DELETE here
+  const deleteNoteState = (entry) => {
+    setNotes((prevNotes) => prevNotes.filter((note) => note._id !== entry._id))
   }
 
   const deleteAllNotesState = () => {
-    // Code for modifying state after DELETE all here
+    setNotes([])
   }
 
   const patchNoteState = (_id, title, content) => {
-    // Code for modifying state after PATCH here
-  }
+    setNotes((prevNotes) => 
+      prevNotes.map((note) => 
+        note._id === _id ? {_id: _id, title: title, content: content} : note
+      )
+    );
+  };
 
   return (
     <div className="App">
@@ -130,7 +170,7 @@ function App() {
           initialNote={dialogNote}
           closeDialog={closeDialog}
           postNote={postNoteState}
-          // patchNote={patchNoteState}
+          patchNote={patchNoteState}
           />
 
       </header>
